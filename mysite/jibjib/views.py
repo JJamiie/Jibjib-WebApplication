@@ -10,7 +10,7 @@ from jibjib.permission import IsOwnerOrReadOnly
 class QuestionMixin(object):
 	queryset = Question.objects.all()
 	serializer_class = QuestionSerializer
-	permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+	permission_classes = (IsOwnerOrReadOnly,)
 
 	def perform_create(self, serializer):
 		serializer.save(owner=self.request.user)
@@ -20,6 +20,49 @@ class questionList(QuestionMixin,generics.ListCreateAPIView):
 
 class questionDetail(QuestionMixin,generics.RetrieveUpdateDestroyAPIView):
 	pass
+
+class AnswerMixin(object):
+	queryset = Answer.objects.all()
+	serializer_class = AnswerSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+
+	def perform_create(self, serializer):
+		serializer.save(owner=self.request.user)
+
+class answerList(AnswerMixin,generics.ListCreateAPIView):
+	pass
+
+class answerDetail(AnswerMixin,generics.RetrieveUpdateDestroyAPIView):
+	pass
+
+class CommentMixin(object):
+	queryset = Comment.objects.all()
+	serializer_class = CommentSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+
+	def perform_create(self, serializer):
+		serializer.save(owner=self.request.user)
+
+class commentList(CommentMixin,generics.ListCreateAPIView):
+	pass
+
+class commentDetail(CommentMixin,generics.RetrieveUpdateDestroyAPIView):
+	pass
+
+class UserProfileMixin(object):
+	queryset = UserProfile.objects.all()
+	serializer_class = UserProfileSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+
+	def perform_create(self, serializer):
+		serializer.save(owner=self.request.user)
+
+class userProfileList(UserProfileMixin,generics.ListCreateAPIView):
+	pass
+
+class userProfileDetail(UserProfileMixin,generics.RetrieveUpdateDestroyAPIView):
+	pass
+ 
 
 
 

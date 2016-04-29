@@ -17,7 +17,7 @@ Including another URLconf
 from django.conf.urls import include, url, patterns 
 from django.contrib import admin
 from jibjib import views
-
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -25,7 +25,18 @@ urlpatterns = [
     # api
     # url(r'^api/question/$', views.post_question,name='post_question'),
     # url(r'^api/question/(?P<pk>[0-9]+)$', views.question_detail, name='question_detail'),
+    url(r'^api-token-auth/', obtain_auth_token),
 
     url(r'^api/questions/$', views.questionList.as_view() ,name='post_question'),
     url(r'^api/questions/(?P<pk>[0-9]+)$', views.questionDetail.as_view() , name='question_detail'),
+
+	url(r'^api/answers/$', views.answerList.as_view() ,name='post_answer'),
+    url(r'^api/answers/(?P<pk>[0-9]+)$', views.answerDetail.as_view() , name='answer_detail'),
+
+    url(r'^api/comments/$', views.commentList.as_view() ,name='post_answer'),
+    url(r'^api/comments/(?P<pk>[0-9]+)$', views.commentDetail.as_view() , name='answer_detail'),
+
+    url(r'^api/userProfiles/$', views.userProfileList.as_view() ,name='post_answer'),
+    url(r'^api/userProfiles/(?P<pk>[0-9]+)$', views.userProfileDetail.as_view() , name='answer_detail'),
+
 ]

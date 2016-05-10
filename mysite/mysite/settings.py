@@ -111,6 +111,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+    ),
+     'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework.filters.DjangoFilterBackend',
     )
 }
 
@@ -120,7 +123,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Bangkok'
 
 USE_I18N = True
 
@@ -134,4 +137,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = 'jibjib/static/media'
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'

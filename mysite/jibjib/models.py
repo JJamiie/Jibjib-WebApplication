@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from datetime import datetime
 # Create your models here.
 
 # This code is triggered whenever a new user has been created and saved to the database
@@ -27,7 +28,7 @@ class UserProfile(models.Model):
 
 class Comment(models.Model):
 	owner = models.ForeignKey(User, related_name='comment_owner')
-	commenter = models.ForeignKey(User,related_name='commenter')
+	commenter = models.ForeignKey(User,related_name='commenter_user')
 	content = models.TextField()
 
 	def __unicode__(self):
@@ -35,31 +36,32 @@ class Comment(models.Model):
 
 
 class Question(models.Model):
-	LANG = (
-        ('TH', 'Thai'),
-        ('EN', 'English'),
-        ('CH', 'Chinese'),
+    LANG = (
+        ('Thai', 'Thai'),
+        ('English', 'English'),
+        ('Chinese', 'Chinese'),
     )
-	owner = models.ForeignKey(User, related_name='question_owner')
-	title = models.CharField(max_length=100)
-	content = models.TextField()
-	from_lang = models.CharField(max_length=20,choices=LANG)
-	to_lang = models.CharField(max_length=20,choices=LANG)
-
-	def __unicode__(self): 
-		return "Owner: "+ self.owner.username +",   Title: " + self.title + ",    Description: " + self.content +",   FROM "+ self.from_lang+ " TO " + self.to_lang  
-
-
+    owner = models.ForeignKey(User, related_name='question_owner')
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    from_lang = models.CharField(max_length=20,choices=LANG)
+    to_lang = models.CharField(max_length=20,choices=LANG)
+    created_at = models.DateTimeField(default=datetime.now)
+    def __unicode__(self):
+        return "Owner: "+ self.owner.username +",   Title: " + self.title + ",    Description: " + self.content +",   FROM "+ self.from_lang+ " to " + self.to_lang
 
 class Answer(models.Model):
 	owner = models.ForeignKey(User, related_name='answer_owner')
 	question  = models.ForeignKey(Question, related_name='answer_question')
 	content = models.TextField()
-	vote = models.PositiveSmallIntegerField(default=0)
 
 	def __unicode__(self):
-		return "Owner: " + self.owner.username + ",   content: " + self.content +",   vote: " + str(self.vote)
+		return "Owner: " + self.owner.username + ",   content: " + self.content
 
+class Vote(models.Model):
+    owner = models.ForeignKey(User, related_name='vote_owner')
+    answer = models.ForeignKey(Answer, related_name='vote_answer')
+    score = models.SmallIntegerField(default=0)
 
-
-
+    def __unicode__(self):
+        return "Owner: " + self.owner.username + ", answer: " + self.answer.question.title +", vote: " + str(self.score)

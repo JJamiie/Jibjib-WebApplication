@@ -5,5 +5,4 @@ admin.site.register(Question)
 admin.site.register(UserProfile)
 admin.site.register(Comment)
 admin.site.register(Answer)
-
-
+admin.site.register(Vote)

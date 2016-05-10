@@ -7,8 +7,20 @@ from jibjib.serializers import *
 from jibjib.models import *
 from jibjib.permission import IsOwnerOrReadOnly
 
+################################# Model user #################################
+
+class UserMixin(object):
+	queryset = User.objects.all().order_by('-id')
+	serializer_class = UserSerializer
+	def perform_create(self, serializer):
+		serializer.save(owner=self.request.user)
+
+class userList(UserMixin,generics.ListCreateAPIView):
+	pass
+################################# Model question #################################
+
 class QuestionMixin(object):
-	queryset = Question.objects.all()
+	queryset = Question.objects.all().order_by('-created_at')
 	serializer_class = QuestionSerializer
 	permission_classes = (IsOwnerOrReadOnly,)
 
@@ -20,6 +32,15 @@ class questionList(QuestionMixin,generics.ListCreateAPIView):
 
 class questionDetail(QuestionMixin,generics.RetrieveUpdateDestroyAPIView):
 	pass
+
+class questionOwn(generics.ListCreateAPIView):
+	serializer_class = QuestionSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+	def get_queryset(self):
+		owner = self.request.user
+		return Question.objects.filter(owner=owner).order_by('-created_at')
+
+################################# Model answer #################################
 
 class AnswerMixin(object):
 	queryset = Answer.objects.all()
@@ -35,6 +56,16 @@ class answerList(AnswerMixin,generics.ListCreateAPIView):
 class answerDetail(AnswerMixin,generics.RetrieveUpdateDestroyAPIView):
 	pass
 
+class answerOfQuestion(generics.ListCreateAPIView):
+	serializer_class = AnswerSerializer
+	def get_queryset(self):
+		idQuestion = self.kwargs['idQuestion']
+		question = Question.objects.filter(id=idQuestion)
+		return Answer.objects.filter(question=question)
+
+
+################################# Model comment #################################
+
 class CommentMixin(object):
 	queryset = Comment.objects.all()
 	serializer_class = CommentSerializer
@@ -49,6 +80,24 @@ class commentList(CommentMixin,generics.ListCreateAPIView):
 class commentDetail(CommentMixin,generics.RetrieveUpdateDestroyAPIView):
 	pass
 
+################################# Model vote #################################
+
+class VoteMixin(object):
+	queryset = Vote.objects.all()
+	serializer_class = VoteSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+
+	def perform_create(self, serializer):
+		serializer.save(owner=self.request.user)
+
+class voteList(VoteMixin,generics.ListCreateAPIView):
+	pass
+
+class voteDetail(VoteMixin,generics.RetrieveUpdateDestroyAPIView):
+	pass
+
+################################# UserProfile question #################################
+
 class UserProfileMixin(object):
 	queryset = UserProfile.objects.all()
 	serializer_class = UserProfileSerializer
@@ -62,10 +111,15 @@ class userProfileList(UserProfileMixin,generics.ListCreateAPIView):
 
 class userProfileDetail(UserProfileMixin,generics.RetrieveUpdateDestroyAPIView):
 	pass
- 
 
+class userProfileOwn(generics.ListCreateAPIView):
+	serializer_class = UserProfileOwnSerializer
+	permission_classes = (IsOwnerOrReadOnly,)
+	def get_queryset(self):
+		owner = self.request.user
+		return UserProfile.objects.filter(owner=owner)
 
-
+#########################################################################################
 
 # Create your views here.
 @api_view(['GET', 'POST'])
@@ -89,7 +143,7 @@ def post_question(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def question_detail(request, pk):
-    
+
     # Get, udpate, or delete a specific task
     try:
         question = Question.objects.get(pk=pk)
